@@ -1,0 +1,10 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Scripts temporary extraction files
+scripts/*.json
+scripts/*.txt
+scripts/*.html
