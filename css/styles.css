@@ -329,7 +329,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .theme-toggle-btn {
@@ -573,6 +573,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-lg);
   transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
   transition: transform var(--transition-slow);
+  cursor: pointer;
 }
 
 .hero-visual-card:hover {
@@ -723,6 +724,13 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
+}
+
+.promo-video-theater.spotlight {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 35px var(--accent-blue-glow);
+  transform: scale(1.02);
 }
 
 .video-theater-header {
@@ -753,13 +761,28 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
 }
 
-.video-meta-badge {
+.video-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.video-control-chip {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 10px;
   background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.video-control-chip:hover {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
 }
 
 .video-wrapper {
@@ -791,6 +814,17 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 16px;
 }
 
+.video-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
 .video-tags {
   display: flex;
   flex-wrap: wrap;
@@ -807,8 +841,40 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
-   Skills Section
+   Skills Section (With Filter & Animation)
    ========================================================================== */
+.skills-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.skill-filter-btn {
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.skill-filter-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.skill-filter-btn.active {
+  background: var(--accent-gradient-blue);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px var(--accent-blue-glow);
+}
+
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -913,9 +979,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .skill-progress-bar {
   height: 100%;
+  width: 0%;
   background: var(--accent-gradient-blue);
   border-radius: var(--radius-full);
-  transition: width 1s ease-in-out;
+  transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .skill-chips {
@@ -935,7 +1002,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
-   Certifications Section
+   Certifications Section (Clickable with Modal)
    ========================================================================== */
 .cert-grid {
   display: grid;
@@ -954,6 +1021,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .cert-card::before {
@@ -1037,6 +1105,15 @@ h1, h2, h3, h4, h5, h6 {
   font-family: monospace;
 }
 
+.cert-verify-prompt {
+  font-size: 0.78rem;
+  color: var(--accent-blue);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* ==========================================================================
    Portfolio Section (Sample Outputs Made in GD)
    ========================================================================== */
@@ -1058,6 +1135,9 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .filter-btn:hover {
@@ -1070,6 +1150,13 @@ h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
   border-color: transparent;
   box-shadow: 0 4px 12px var(--accent-blue-glow);
+}
+
+.filter-count {
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
 }
 
 .portfolio-grid {
@@ -1230,6 +1317,7 @@ h1, h2, h3, h4, h5, h6 {
 .contact-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   padding: 16px;
   background: var(--bg-card);
@@ -1241,6 +1329,12 @@ h1, h2, h3, h4, h5, h6 {
 .contact-item:hover {
   border-color: var(--border-light);
   transform: translateX(4px);
+}
+
+.contact-item-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .contact-icon {
@@ -1271,6 +1365,26 @@ h1, h2, h3, h4, h5, h6 {
 
 .contact-details a:hover {
   color: var(--accent-blue);
+}
+
+.copy-btn {
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.copy-btn:hover {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
 }
 
 .social-links-row {
@@ -1324,11 +1438,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .form-group label {
-  display: block;
+  display: flex;
+  justify-content: space-between;
   font-size: 0.88rem;
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--text-primary);
+}
+
+.char-counter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 .form-control {
@@ -1354,10 +1475,16 @@ textarea.form-control {
   min-height: 120px;
 }
 
+.form-actions-row {
+  display: flex;
+  gap: 12px;
+}
+
 /* ==========================================================================
-   Project Modal / Lightbox Dialog
+   Project Modal / Lightbox Dialog (With Zoom & Thumbnails)
    ========================================================================== */
-dialog#project-modal {
+dialog#project-modal,
+dialog#cert-modal {
   margin: auto;
   border: none;
   background: transparent;
@@ -1369,7 +1496,7 @@ dialog#project-modal {
   color: var(--text-primary);
 }
 
-dialog#project-modal::backdrop {
+dialog::backdrop {
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -1399,6 +1526,30 @@ dialog#project-modal::backdrop {
   font-size: 1.25rem;
 }
 
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.modal-icon-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
 .modal-close-btn {
   width: 36px;
   height: 36px;
@@ -1423,7 +1574,7 @@ dialog#project-modal::backdrop {
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .modal-media-showcase {
@@ -1434,14 +1585,22 @@ dialog#project-modal::backdrop {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 340px;
   max-height: 520px;
 }
 
 .modal-media-showcase img {
-  max-height: 500px;
+  max-height: 480px;
   width: auto;
   object-fit: contain;
   margin: 0 auto;
+  transition: transform 0.2s ease;
+  cursor: zoom-in;
+}
+
+.modal-media-showcase img.zoomed {
+  transform: scale(1.6);
+  cursor: zoom-out;
 }
 
 .modal-carousel-nav {
@@ -1486,6 +1645,40 @@ dialog#project-modal::backdrop {
   color: #ffffff;
 }
 
+/* Modal Thumbnail Strip */
+.modal-thumb-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.modal-strip-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid var(--border-subtle);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+}
+
+.modal-strip-thumb.active,
+.modal-strip-thumb:hover {
+  opacity: 1;
+  border-color: var(--accent-blue);
+  transform: scale(1.05);
+}
+
+.modal-strip-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .modal-details {
   display: flex;
   flex-direction: column;
@@ -1526,8 +1719,89 @@ dialog#project-modal::backdrop {
 .modal-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 8px;
+}
+
+/* ==========================================================================
+   Certificate Modal Styles
+   ========================================================================== */
+.cert-preview-card {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: var(--radius-md);
+  padding: 36px 30px;
+  border: 8px double #cbd5e1;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.cert-preview-card h2 {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: #1e3a8a;
+  margin-bottom: 6px;
+}
+
+.cert-preview-card .cert-subhead {
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.cert-preview-card .cert-presented-to {
+  font-size: 0.82rem;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.cert-preview-card .cert-recipient-name {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  border-bottom: 2px solid #e2e8f0;
+  display: inline-block;
+  padding: 0 24px 6px 24px;
+  margin-bottom: 16px;
+}
+
+.cert-preview-card .cert-award-desc {
+  font-size: 0.95rem;
+  color: #334155;
+  max-width: 580px;
+  margin: 0 auto 24px auto;
+  line-height: 1.6;
+}
+
+.cert-card-signatures {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 20px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.cert-seal-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fef3c7;
+  border: 2px solid #d97706;
+  color: #b45309;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-transform: uppercase;
 }
 
 /* Toast Notification */

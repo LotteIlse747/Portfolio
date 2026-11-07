@@ -21,6 +21,9 @@ const projectsData = [
     poster: "assets/promo_video/video_poster.jpg",
     media: [
       { type: "video", src: "assets/promo_video/3CS4_Gutierrez_Andrei_PromoVideo.mp4", poster: "assets/promo_video/video_poster.jpg", caption: "Full 1080p Promotional Video Showcase" }
+    ],
+    downloads: [
+      { label: "Download MP4 Video", url: "assets/promo_video/3CS4_Gutierrez_Andrei_PromoVideo.mp4" }
     ]
   },
   {
@@ -149,21 +152,68 @@ const projectsData = [
   }
 ];
 
+// Certifications Data Catalog
+const certsData = [
+  {
+    id: "cert-gd",
+    title: "Graphic Design & Visual Communications Specialization",
+    issuer: "City College of Calamba — Department of Computer Studies",
+    program: "Bachelor of Science in Computer Science (Class 3CS4)",
+    date: "First Semester, Academic Year 2026–2027",
+    credentialId: "CCC-GD-3CS4-2026",
+    description: "Demonstrated exemplary competence in graphic design foundations, brand architecture, vector illustration in Adobe Illustrator, raster manipulation in Photoshop, and color psychology."
+  },
+  {
+    id: "cert-uiux",
+    title: "Interactive UI/UX Wireframing & Prototyping",
+    issuer: "Figma & Digital Product Architecture",
+    program: "KainNow Mobile Food Ordering App Project",
+    date: "Academic Year 2026",
+    credentialId: "KAINNOW-UX-2026",
+    description: "Certified proficiency in user research synthesis, information architecture, mid-fidelity wireframing flows, component design systems, and interactive clickable mobile prototypes in Figma."
+  },
+  {
+    id: "cert-editorial",
+    title: "Editorial Publication & Typographic Design",
+    issuer: "AURA Magazine & Print Systems",
+    program: "Editorial Design & Creative Direction",
+    date: "Academic Year 2026",
+    credentialId: "AURA-MAG-01",
+    description: "Recognized mastery of editorial page composition, multi-column grid layouts, typographic pairing hierarchy, negative space discipline, and print-ready document curation."
+  },
+  {
+    id: "cert-video",
+    title: "Promotional Video & Motion Advertising",
+    issuer: "3CS4 Multimedia Production Suite",
+    program: "Cinematic Promotional Video Project",
+    date: "Academic Year 2026",
+    credentialId: "3CS4-PROMO-VIDEO",
+    description: "Demonstrated advanced skill in commercial video editing, audio-visual rhythm synchronization, kinetic typography animation, and digital media advertising delivery."
+  }
+];
+
 // State Management
 let currentFilter = "all";
 let activeModalProject = null;
 let currentModalPageIndex = 0;
+let isImageZoomed = false;
 
 // DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initTypewriter();
   initNavigation();
+  initHeroActions();
+  initVideoPlayerControls();
+  initSkillsSection();
+  initCertifications();
   renderPortfolioGrid();
   initFilterTabs();
   initModalListeners();
   initContactForm();
+  initCopyButtons();
   initBackToTop();
+  handleUrlHashRouting();
 });
 
 /* ==========================================================================
@@ -182,6 +232,7 @@ function initTheme() {
       document.documentElement.setAttribute("data-theme", next);
       localStorage.setItem("portfolio_theme", next);
       updateThemeIcon(next);
+      showToast(`Switched to ${next} theme`, "info");
     });
   }
 }
@@ -302,6 +353,203 @@ function initNavigation() {
 }
 
 /* ==========================================================================
+   Hero Actions & Card Click
+   ========================================================================== */
+function initHeroActions() {
+  const heroCard = document.querySelector(".hero-visual-card");
+  heroCard?.addEventListener("click", () => {
+    openProjectModal("aura-magazine");
+  });
+
+  const watchPromoBtn = document.getElementById("btn-watch-promo");
+  watchPromoBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const aboutSection = document.getElementById("about");
+    const video = document.getElementById("main-promo-video");
+    const theater = document.querySelector(".promo-video-theater");
+
+    aboutSection?.scrollIntoView({ behavior: "smooth" });
+    if (theater) {
+      theater.classList.add("spotlight");
+      setTimeout(() => theater.classList.remove("spotlight"), 3000);
+    }
+    if (video) {
+      setTimeout(() => {
+        video.play().catch(() => {});
+      }, 600);
+    }
+  });
+}
+
+/* ==========================================================================
+   Video Player Header Controls
+   ========================================================================== */
+function initVideoPlayerControls() {
+  const video = document.getElementById("main-promo-video");
+  const playBtn = document.getElementById("vid-ctrl-play");
+  const fullscreenBtn = document.getElementById("vid-ctrl-fullscreen");
+  const speedBtn = document.getElementById("vid-ctrl-speed");
+
+  if (!video) return;
+
+  playBtn?.addEventListener("click", () => {
+    if (video.paused) {
+      video.play();
+      playBtn.textContent = "Pause";
+    } else {
+      video.pause();
+      playBtn.textContent = "Play";
+    }
+  });
+
+  video.addEventListener("play", () => {
+    if (playBtn) playBtn.textContent = "Pause";
+  });
+  video.addEventListener("pause", () => {
+    if (playBtn) playBtn.textContent = "Play";
+  });
+
+  fullscreenBtn?.addEventListener("click", () => {
+    if (video.requestFullscreen) {
+      video.requestFullscreen();
+    } else if (video.webkitRequestFullscreen) {
+      video.webkitRequestFullscreen();
+    }
+  });
+
+  const speeds = [1, 1.25, 1.5, 2];
+  let speedIdx = 0;
+  speedBtn?.addEventListener("click", () => {
+    speedIdx = (speedIdx + 1) % speeds.length;
+    video.playbackRate = speeds[speedIdx];
+    speedBtn.textContent = `${speeds[speedIdx]}x Speed`;
+    showToast(`Playback speed set to ${speeds[speedIdx]}x`, "info");
+  });
+}
+
+/* ==========================================================================
+   Skills Section (Filter & Scroll Fill Animation)
+   ========================================================================== */
+function initSkillsSection() {
+  const cards = document.querySelectorAll(".skill-category-card");
+  const filterBtns = document.querySelectorAll(".skill-filter-btn");
+
+  // Animate progress bars when entering viewport
+  const progressBars = document.querySelectorAll(".skill-progress-bar");
+  const progressObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bar = entry.target;
+        const targetWidth = bar.getAttribute("data-target") || "85%";
+        bar.style.width = targetWidth;
+      }
+    });
+  }, { threshold: 0.2 });
+
+  progressBars.forEach(bar => {
+    const currentStyle = bar.getAttribute("style");
+    const match = currentStyle ? currentStyle.match(/width:\s*([^;]+);/) : null;
+    if (match) {
+      bar.setAttribute("data-target", match[1].trim());
+      bar.style.width = "0%";
+    }
+    progressObserver.observe(bar);
+  });
+
+  // Filter skills categories
+  filterBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      filterBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const targetCategory = btn.getAttribute("data-skill-filter");
+
+      cards.forEach(card => {
+        if (targetCategory === "all" || card.getAttribute("data-skill-cat") === targetCategory) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  });
+}
+
+/* ==========================================================================
+   Certifications Section & Interactive Certificate Modal
+   ========================================================================== */
+function initCertifications() {
+  const certCards = document.querySelectorAll(".cert-card");
+  const certModal = document.getElementById("cert-modal");
+  const closeBtn = document.getElementById("cert-modal-close-btn");
+  const copyIdBtn = document.getElementById("cert-copy-id-btn");
+  const printBtn = document.getElementById("cert-print-btn");
+
+  certCards.forEach(card => {
+    card.addEventListener("click", () => {
+      const id = card.getAttribute("data-cert-id");
+      openCertModal(id);
+    });
+
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const id = card.getAttribute("data-cert-id");
+        openCertModal(id);
+      }
+    });
+  });
+
+  closeBtn?.addEventListener("click", () => certModal?.close());
+
+  certModal?.addEventListener("click", (e) => {
+    const dialogDimensions = certModal.getBoundingClientRect();
+    if (
+      e.clientX < dialogDimensions.left ||
+      e.clientX > dialogDimensions.right ||
+      e.clientY < dialogDimensions.top ||
+      e.clientY > dialogDimensions.bottom
+    ) {
+      certModal.close();
+    }
+  });
+
+  copyIdBtn?.addEventListener("click", () => {
+    const idEl = document.getElementById("cert-modal-id");
+    if (idEl) {
+      navigator.clipboard.writeText(idEl.textContent).then(() => {
+        showToast("Credential ID copied to clipboard!", "success");
+      });
+    }
+  });
+
+  printBtn?.addEventListener("click", () => {
+    window.print();
+  });
+}
+
+function openCertModal(certId) {
+  const cert = certsData.find(c => c.id === certId) || certsData[0];
+  const modal = document.getElementById("cert-modal");
+  if (!modal || !cert) return;
+
+  const titleEl = document.getElementById("cert-modal-title");
+  const issuerEl = document.getElementById("cert-modal-issuer");
+  const progEl = document.getElementById("cert-modal-program");
+  const dateEl = document.getElementById("cert-modal-date");
+  const descEl = document.getElementById("cert-modal-desc");
+  const idEl = document.getElementById("cert-modal-id");
+
+  if (titleEl) titleEl.textContent = cert.title;
+  if (issuerEl) issuerEl.textContent = cert.issuer;
+  if (progEl) progEl.textContent = cert.program;
+  if (dateEl) dateEl.textContent = cert.date;
+  if (descEl) descEl.textContent = cert.description;
+  if (idEl) idEl.textContent = cert.credentialId;
+
+  modal.showModal();
+}
+
+/* ==========================================================================
    Portfolio Rendering & Filtering
    ========================================================================== */
 function renderPortfolioGrid() {
@@ -350,6 +598,18 @@ function renderPortfolioGrid() {
       }
     });
   });
+
+  updateFilterCounts();
+}
+
+function updateFilterCounts() {
+  const buttons = document.querySelectorAll(".filter-btn");
+  buttons.forEach(btn => {
+    const cat = btn.getAttribute("data-filter");
+    const count = cat === "all" ? projectsData.length : projectsData.filter(p => p.category === cat).length;
+    const countEl = btn.querySelector(".filter-count");
+    if (countEl) countEl.textContent = count;
+  });
 }
 
 function initFilterTabs() {
@@ -365,13 +625,15 @@ function initFilterTabs() {
 }
 
 /* ==========================================================================
-   Project Modal Lightbox
+   Project Modal Lightbox (With Zoom, Carousel & Strip)
    ========================================================================== */
 function initModalListeners() {
   const modal = document.getElementById("project-modal");
   const closeBtn = document.getElementById("modal-close-btn");
   const prevBtn = document.getElementById("carousel-prev");
   const nextBtn = document.getElementById("carousel-next");
+  const zoomBtn = document.getElementById("modal-zoom-btn");
+  const shareBtn = document.getElementById("modal-share-btn");
 
   if (!modal) return;
 
@@ -394,12 +656,45 @@ function initModalListeners() {
   prevBtn?.addEventListener("click", () => stepModalMedia(-1));
   nextBtn?.addEventListener("click", () => stepModalMedia(1));
 
+  // Zoom button
+  zoomBtn?.addEventListener("click", toggleImageZoom);
+
+  // Share button
+  shareBtn?.addEventListener("click", () => {
+    if (activeModalProject) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}#project-${activeModalProject.id}`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("Project link copied to clipboard!", "success");
+      });
+    }
+  });
+
   // Keyboard navigation
   window.addEventListener("keydown", (e) => {
     if (!modal.open) return;
     if (e.key === "ArrowLeft") stepModalMedia(-1);
     if (e.key === "ArrowRight") stepModalMedia(1);
+    if (e.key === "+" || e.key === "=") toggleImageZoom(true);
+    if (e.key === "-") toggleImageZoom(false);
   });
+}
+
+function toggleImageZoom(forceState) {
+  const img = document.querySelector("#modal-media-content img");
+  if (!img) return;
+
+  if (typeof forceState === "boolean") {
+    isImageZoomed = forceState;
+  } else {
+    isImageZoomed = !isImageZoomed;
+  }
+
+  if (isImageZoomed) {
+    img.classList.add("zoomed");
+    showToast("Zoomed In (Click or press - to zoom out)", "info");
+  } else {
+    img.classList.remove("zoomed");
+  }
 }
 
 function openProjectModal(projectId) {
@@ -408,6 +703,7 @@ function openProjectModal(projectId) {
 
   activeModalProject = project;
   currentModalPageIndex = 0;
+  isImageZoomed = false;
 
   const modal = document.getElementById("project-modal");
   const titleEl = document.getElementById("modal-project-title");
@@ -444,6 +740,7 @@ function openProjectModal(projectId) {
   }
 
   updateModalMediaDisplay();
+  renderModalThumbnailStrip();
   modal.showModal();
 }
 
@@ -457,8 +754,11 @@ function updateModalMediaDisplay() {
   const counterEl = document.getElementById("modal-page-counter");
   const prevBtn = document.getElementById("carousel-prev");
   const nextBtn = document.getElementById("carousel-next");
+  const zoomBtn = document.getElementById("modal-zoom-btn");
 
   if (!container || !currentItem) return;
+
+  isImageZoomed = false;
 
   if (currentItem.type === "video") {
     container.innerHTML = `
@@ -467,10 +767,15 @@ function updateModalMediaDisplay() {
         Your browser does not support the video tag.
       </video>
     `;
+    if (zoomBtn) zoomBtn.style.display = "none";
   } else {
     container.innerHTML = `
-      <img src="${currentItem.src}" alt="${currentItem.caption || 'Project visual'}" style="max-height:500px; width:auto; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+      <img src="${currentItem.src}" alt="${currentItem.caption || 'Project visual'}" id="modal-active-img" style="max-height:480px; width:auto; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
     `;
+    if (zoomBtn) zoomBtn.style.display = "flex";
+
+    const img = document.getElementById("modal-active-img");
+    img?.addEventListener("click", () => toggleImageZoom());
   }
 
   if (captionEl) captionEl.textContent = currentItem.caption || "";
@@ -494,6 +799,42 @@ function updateModalMediaDisplay() {
       nextBtn.style.display = "none";
     }
   }
+
+  // Highlight active thumbnail in strip
+  const thumbs = document.querySelectorAll(".modal-strip-thumb");
+  thumbs.forEach((t, idx) => {
+    if (idx === currentModalPageIndex) {
+      t.classList.add("active");
+    } else {
+      t.classList.remove("active");
+    }
+  });
+}
+
+function renderModalThumbnailStrip() {
+  const strip = document.getElementById("modal-thumb-strip");
+  if (!strip || !activeModalProject || !activeModalProject.media) return;
+
+  const mediaList = activeModalProject.media;
+  if (mediaList.length <= 1) {
+    strip.style.display = "none";
+    return;
+  }
+
+  strip.style.display = "flex";
+  strip.innerHTML = mediaList.map((m, idx) => `
+    <div class="modal-strip-thumb ${idx === currentModalPageIndex ? 'active' : ''}" data-index="${idx}" title="${m.caption || ''}">
+      <img src="${m.type === 'video' ? m.poster : m.src}" alt="thumb ${idx + 1}">
+    </div>
+  `).join("");
+
+  strip.querySelectorAll(".modal-strip-thumb").forEach(thumb => {
+    thumb.addEventListener("click", () => {
+      const idx = parseInt(thumb.getAttribute("data-index"), 10);
+      currentModalPageIndex = idx;
+      updateModalMediaDisplay();
+    });
+  });
 }
 
 function stepModalMedia(direction) {
@@ -504,10 +845,31 @@ function stepModalMedia(direction) {
 }
 
 /* ==========================================================================
-   Contact Form & Feedback
+   URL Hash Routing (Deep Linking)
+   ========================================================================== */
+function handleUrlHashRouting() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith("#project-")) {
+    const id = hash.replace("#project-", "");
+    setTimeout(() => {
+      openProjectModal(id);
+    }, 400);
+  }
+}
+
+/* ==========================================================================
+   Contact Form & Feedback (With LocalStorage Store)
    ========================================================================== */
 function initContactForm() {
   const form = document.getElementById("portfolio-contact-form");
+  const msgInput = document.getElementById("contact-message");
+  const charCounter = document.getElementById("char-counter");
+
+  msgInput?.addEventListener("input", () => {
+    const len = msgInput.value.length;
+    if (charCounter) charCounter.textContent = `${len} characters`;
+  });
+
   if (!form) return;
 
   form.addEventListener("submit", (e) => {
@@ -515,16 +877,47 @@ function initContactForm() {
 
     const name = document.getElementById("contact-name")?.value.trim();
     const email = document.getElementById("contact-email")?.value.trim();
-    const message = document.getElementById("contact-message")?.value.trim();
+    const subject = document.getElementById("contact-subject")?.value.trim() || "Portfolio Inquiry";
+    const message = msgInput?.value.trim();
 
     if (!name || !email || !message) {
       showToast("Please fill in all required fields.", "error");
       return;
     }
 
-    // Success response simulation
+    // Save to localStorage inbox so messages are safely stored
+    const newMsg = {
+      name,
+      email,
+      subject,
+      message,
+      timestamp: new Date().toISOString()
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem("portfolio_inbox") || "[]");
+      existing.push(newMsg);
+      localStorage.setItem("portfolio_inbox", JSON.stringify(existing));
+    } catch {}
+
+    // Success response notification
     showToast(`Thank you, ${name}! Your message has been sent to Andrei.`, "success");
     form.reset();
+    if (charCounter) charCounter.textContent = "0 characters";
+  });
+}
+
+/* ==========================================================================
+   Copy to Clipboard Helpers
+   ========================================================================== */
+function initCopyButtons() {
+  const copyEmailBtn = document.getElementById("copy-email-btn");
+  copyEmailBtn?.addEventListener("click", () => {
+    const email = "afgutierrez@ccc.edu.ph";
+    navigator.clipboard.writeText(email).then(() => {
+      showToast("Email afgutierrez@ccc.edu.ph copied to clipboard!", "success");
+    }).catch(() => {
+      showToast("Email: afgutierrez@ccc.edu.ph", "info");
+    });
   });
 }
 
@@ -537,13 +930,17 @@ function showToast(message, type = "success") {
     document.body.appendChild(toast);
   }
 
+  let iconSvg = "";
+  if (type === "success") {
+    iconSvg = `<svg width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+  } else if (type === "error") {
+    iconSvg = `<svg width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+  } else {
+    iconSvg = `<svg width="20" height="20" fill="none" stroke="#3b82f6" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+  }
+
   toast.innerHTML = `
-    <span class="toast-icon">
-      ${type === "success" 
-        ? `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
-        : `<svg width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`
-      }
-    </span>
+    <span class="toast-icon">${iconSvg}</span>
     <span class="toast-text">${message}</span>
   `;
 
